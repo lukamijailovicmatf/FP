@@ -1,0 +1,156 @@
+---------
+|Functor|
+---------
+
+* type Functor :: (* -> *) -> Constraint
+
+
+* Functor je klasa kao i sve ostalo, na primer Ord, Num, Eq, ...
+
+
+* Da bi neki tip "bio" Functor, on mora da implementira osnovne minimalne funkcije potrebne za
+  klasu Functor, a to je funkcija fmap (kao sto bi neki tip pripadao klasi Eq, on mora da 
+  implementira ==)
+
+
+* potpis fmap je: fmap :: Functor f => (a -> b) -> f a -> f b
+  Sta ovo znaci? U potpisu imamo "Functor f", sto na primer nije moglo da stoji "Functor (f a)" nego
+  bas "Functor f"? Poenta je u potpisu navedenom sa pocetka tj. type Functor :: (* -> *) -> Constraint.
+  Ovaj potpis kaze da Functor uzima zvezdu i slika u zvezdu. Znak * citajmo kao TIP. Znaci potpis nam
+  kaze ovako UZIMAM TIP, VRACAM TIP u bukvalnom prevodu. Na primer, "Maybe a", to je jedan tip, 
+  Maybe je Functor, znaci ovde bismo imali "Maybe a = f a", znaci "Maybe = f" tj. Maybe je funktor.
+  Posto je Maybe funktor, sta dobijamo ako u definiciji zamenimo "Maybe = Functor"?
+  Zamena [Maybe = Functor]: Maybe :: * -> *
+  Znaci Maybe uzme tip i napravi tip tj. vrati tip. Odnosno, uzme "a" i napravi "Maybe a". Prva
+  zvezdica je "a", druga je "Maybe a", znaci dobije se "a", vrati se "Maybe a".
+  Zato stoji Maybe da je funktor, ne moze da stoji "Maybe a" da je funktor, jer on primi argument i
+  napravi tip. Zato je * -> *.
+
+
+* Sledece za razmatranje moze biti tip "Either a b". Da li je Either funktor? Ne. Nije zato sto da bi
+  nesto bilo Functor mora da ima Functor :: * -> *.
+  Sta radi Either? On primi "a", primi "b" i pravi od toga "Either a b". Ali Functor ima potpis (* -> *)
+  koji je naveden jos na samom pocetku tj. prima jedan tip i vraca novi, ali mi ovde imamo da se prima
+  "a" pa se prima "b" i vraca se "Either a b", a to odgovara sledecem potpisu: (* -> * -> *, prva * je
+  "a" druga * je "b" dok je treca * "Either a b"), tako da Either nije funktor.
+  "Either" nije, ali "Either a" jeste, zasto? Da bi shvatili zasto "Either a" jeste Functor vratimo se
+  na definiciju tj. potpis za Functor. Potpis za Functor glasi: Functor :: (* -> *), a mi tvrdimo da je
+  Functor = Either a, pa hajde da vidimo posto imamo sada "Either a" kao gotov tip, sta on zapravo radi?
+  Kada uzmemo "b" mi vratimo onda "Either a b" tj. posmatrajuci potpis (* -> *) prva * nam je "b" koje
+  dobijamo kao prvi argument, a druga * nam je vraceno "Either a b" pa konacno potpis za "Either a" koji
+  nam je Functor glasi ovako "Either a :: * -> *".
+
+
+* Iz svega recenog do sada zakljucujemo da Functor uvek mora da ima potpis koji odgovara sledecem
+  sablonu (* -> *), a ne da imamo na primer ovakav sablon (* -> * -> *) ili neki slican.
+  Stoga, "Either" ne moze tek tako biti u klasi Functor jer bi onda njegov potpis bio (* -> * -> *)
+  jer bi morali da prosledimo "a" (prva * u potpisu) pa onda da prosledimo "b" (druga * u potpisu) pa
+  tek onda nakon prosledjenih argumenata "a" i "b" bismo mogli da gradimo tip "Either a b". Zato kada
+  instanciramo Functor za Either kazemo u samom kodu ovako nesto:
+
+  							instance Functor (Either a) where
+  							-- dalja implementacija...
+
+
+* Za listu funktor je "[] a = f a", znaci "[] = f", nije [a] jer Functor uvek "obmotava nesto" tj.
+  mozemo da kazemo i "pakuje u kutiju". Naime, funktor mozemo da zamislimo i kao kutiju. 
+  Na primer "Maybe a", zamislimo sada da imamo kutiju na kojoj pise nalepnica "Maybe Int" 
+  (ovde smo uzeli a = Int radi jednostavnosti). Znaci "Maybe Int" pise na kutiji koja je zatvorena, a
+  unutar kutije se nalazi ta neka vrednost Int tj. neki konkretan broj ili se nalazi Nothing (ova
+  vrednost nam govori da ne znamo tacno sta se nalazi u nasoj kutiji, ili je u pitanju neki konkretan
+  broj ili nema nista). I poenta je da je nas Functor u ovom slucaju Maybe fakticki "zamotao" taj broj
+  kao poklon i zalepio na njemu nalepnicu "Maybe Int", gde ta nalepnica treba da sugerise sta je
+  zapravo sadrzaj tog poklona, a u ovom slucaju to je ili neka konkretna vrednost tipa Int ili nista
+  tj. Nothing.
+
+
+* Slicno, "Either a" posto je to Functor, na nalepnici pise "Either a Int" tj. unutar kutije je
+  zapakovana vrednost Int (Int nam predstavlja "b" iz potpisa "Either a b"), znaci isto kao prethodni
+  primer Functor nam pakuje neku vrednost tj. "cuva je u tajnosti zatvorenu u kutiji".
+
+
+* Evo na primer uzmimo listu, posto je [] functor za listu, na nalepnici kutije pise "[] Int", a sta je
+  u kutiji onda? U kutiji je zapakovan niz nekih Int-ova, na primer neka to budu brojevi 4,5,6,1,-10,11.
+  Znaci funktor [] (citajmo ovo "funktor lista") pakuje niz nekih brojeva unutra tj. cuva ih u tajnosti
+  jer je kutija zatvorena.
+
+
+* E sada konkretno kako se sve ovo koristi za fmap, jer setimo se sta smo rekli, da bi nesto pripadalo
+  klasi Functor minimalno i jedino sto mora da implementira pri instanciranju je fmap!
+
+
+* fmap :: Functor f => (a -> b) -> f a -> f b
+* Sta nam "kaze" fmap: 1. uzimam neku funkciju koja prima "a" vraca "b" (a -> b)
+                       2. uzimam kao drugi argument neki funktor (f a)
+                       3. vracam rezultat moje funkcije (a -> b) koja je prvi argument
+                          zapakovanu u Functor f, (f b)
+  Znaci, primi se funkcija, primi se funktor, i upakuje se povratna vrednost primljene funkcije
+  u funktor koji je zadat kao drugi argument funkcije fmap.
+
+
+* Primer da bi bilo jasnije: fmap (+3) (Just 5)
+  Sta ovo radi?
+  Znaci prvi argument fmap-a je funkcija koja radi +3 tj. ova funkcija ocekuje Int i vrati Int tj.
+  (+3) :: Int -> Int znaci a = Int, b = Int.
+  Drugi argument je "Just 5", to je ona nalepnica na kutiji "Maybe Int" (Just Int ili Nothing) ali znaci
+  nama je ovde "Just Int" posto imamo vrednost 5, znaci "Just Int" je "nalepnica" na kutiji koja unutra
+  ima broj 5.
+  I sta uradi fmap, znaci, ova funkcija +3 uzme iz kutije vrednost "a", sto je kod nas Int, primeni
+  funkciju na taj Int i vrati Int tj. "b". Znaci uzima se vrednost iz kutije, znaci funkcija +3 je uzela
+  5, primeni se +3 na 5, to je 5 + 3 = 8, i onda je ovo 8 rezultat funkcije +3 tj. b = 8. Medjutim, da
+  li je to sve? Odgovor je ne. Pa kada je ta prva funkcija tj. u ovom slucaju +3 vratila rezultat "b",
+  potrebno je da se taj rezultat funkcije zapakuje u "f". Kod nas je u ovom slucaju "f = Maybe" tj.
+  posto imamo vrednost 8 znaci da nam je konacan rezultat "Just 8". Ovim je fmap konacno odradila sve
+  svoje korake i time je zavrsena.
+
+
+* Sledeci primer moze da bude za "Either a": fmap (*4) (Right 7)
+  Sta ovo radi?
+  Znaci "f a = Either a b" ako krenemo da obradjujemo ovu jednakost tako sto krenemo da razmisljamo
+  kao Haskell imamo da je "f = Either a", a onda nakon ovog prvog uparivanja ostaje jos "a = b", 
+  sukcesivno.
+  Imamo *4, setimo se potpisa fmap :: (a -> b) -> f a -> f b, znaci *4 je kod nas (a -> b), a onda u
+  nastavku ta funkcija *4 treba da se primeni na (f a) gledano iz potpisa fmap-a tj. ona kaze "okej
+  vec imam sledeca uparivanja {f = Either a} i imam {a = b}" sto znaci da mi "f" tj. funktor vec imamo
+  i znamo u koji KONTEKST tj. u kakav "tip kutije" cemo mi zapakovati konacan rezultat primene nase
+  funkcije, samo je potrebno da vidimo na sta se nasa funkcija, u ovom slucaju *4 primenjuje.
+  Konacno, funkcija *4 uzima vrednost "a", znaci to je ovo "b" kod nas u Either-u tj. "Right b" i onda
+  uzimamo "b" primenimo 7 * 4 = 28 i onda zapakujemo 28 u functor, znaci zapakujemo vrednost primene
+  funkcije u KONTEKST tj. u kutiju a to je "Right 28".
+
+
+* A sta da smo imali ovako nesto: fmap (*4) (Left 7)
+  Sta ovo radi?
+  Znaci ovde imamo sledeci slucaj. Imamo "Left 7" tj. "Left a" ali nama je
+  (Either a b = Left a | Right b), nama je funktor "Either a", a ovo "a" (iz Either-a ?) nam je
+  "b" (... ?), znaci *4 kaze uzmi "b", ali koje "b"? Mi imamo ovde "Left a" tj. "Left 7", nemamo "b",
+  pa funkcija ni ne primeni nista jer nema "b", znaci moralo je Right da bude. I onda se samo vrati
+  "Left 7" ne modifikuje se nista jer funkciji nije prosledjeno "b", posto je "Left a", a nama je
+  "Functor = Either a" pa iz tog razloga se funkcija nije primenila jer ocekuje "b", a "Right b" ima
+  samo, a nama je prosledjeno "Left a", tako da nam se samo "Left a" i vraca.
+
+
+* Sledeci primer moze da bude ovakav: fmap (*4) [3,2,4,0,1]
+  Sta ovo radi?
+  Functor je znaci f a = [3,2,4,0,1], medjutim rekli smo da je functor [], dok ovo "a" zamisljamo
+  kao a = 3,2,4,0,1.
+  Znaci lista upakuje te vrednosti.
+  Ovde *4 kaze, "vadim iz kutije taj niz vrednosti i primenjujem *4 na svaku od njih" ali dobro
+  pitanje je sto se *4 primenjuje na svaku vrednost?
+  Pa ret value (povratna vrednost) od fmap je isto [a], tj mora da se upakuje opet u kutiju.
+  Postupak rada funkcije: uzme 3*4, pa 2*4, pa 4*4, pa 0*4, pa 1*4 sukcesivno iz niza i te rezultate
+  upakuje u listu tj. funktor tako da je resenje [12,8,16,0,4] tj. primenjena funkcija na taj niz, pa
+  onda sve te rezultate zapakujemo u listu tj. functor.
+
+
+* znaci fmap f (nesto): ovaj prvi argument "f" vadi iz kutije to sto ima, pa primeni "f" na to sto je
+  izvadio, dobije rezultat "b" (setimo se potpisa, da primamo funkciju koja radi preslikavanje "a -> b"
+  znaci nama je "b" rezultat rada te funkcije koja se primenjuje na elemente) i onda zapakujemo u isti
+  TIP KUTIJE (npr. Maybe, [], Either, ...) to sto je dobijeno kao "b" tj. kao rezultat rada prosledjene
+  funkcije u kutiju nazad
+
+
+* Potpuno analogna prica je i za Applicative i za Monade (ovde se zamislja kutija i funktor), jer sve
+  sto je Monada mora biti aplikativ, a sve sto je aplikativ mora biti funktor. Samo se potpisi funkcija
+  razlikuju i to je sve, ali logika je potpuno ista, samo za druge funkcije kao sto su pure, <*>, >>=,
+  ...
