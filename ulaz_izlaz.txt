@@ -1,0 +1,74 @@
+Pretpostavimo da imamo fajl "ulaz.txt" ciji je sadrzaj:
+    Zdravo svete
+    Haskell je super
+
+
+1. readFile
+------------
+
+* Teorijska osnova: Potpis ove funkcije je readFile :: FilePath -> IO String. Ova funkcija uzima putanju do fajla (FilePath) i
+  vraca I/O akciju koja ucitava citav sadrzaj u jedan String (ukljucujuci i nevidljive karaktere za novi red \n). Posto komunicira
+  sa spoljnim svetom, izvrsava se unutar IO monade.
+
+* Primer:
+  sadrzaj <- readFile "ulaz.txt"   -- 'sadrzaj' dobija vrednost: "Zdravo svete\nHaskell je super\n"
+
+
+2. lines
+---------
+
+* Teorijska osnova: Potpis ove funkcije je lines :: String -> [String]. Cista funkcija (ne radi I/O) koja uzima jedan veliki String i
+  sece ga na listu pojedinacnih redova ([String]). Presek se vrsi na svakom karakteru za novi red (\n), pri cemu se sam znak \n izbacuje.
+  
+* Primer:
+  let redovi = lines "Zdravo svete\nHaskell je super"   -- 'redovi' postaje lista od 2 elementa: ["Zdravo svete", "Haskell je super"]
+
+
+3. words
+---------
+
+* Teorijska osnova: Potpis ove funkcije je words :: String -> [String]. Cista funkcija koja razbija tekst na listu svih pojedinacnih reci ([String]).
+  Kao separatore koristi sve beline koje se javljaju u datom tekstu: razmake (' '), tabulatore (\t) i nove redove (\n).
+  
+* Primer:
+  let reci = words "Zdravo svete\nHaskell je super"   -- 'reci' postaje lista od 5 elemenata: ["Zdravo", "svete", "Haskell", "je", "super"]
+
+
+4. unwords
+-----------
+
+* Teorijska osnova: Potpis ove funkcije je unwords :: [String] -> String. Suprotna operacija od words. Uzima listu reci ([String]) i spaja ih u jedan
+  jedini String, stavljajuci po jedan razmak izmedju svake dve reci.
+  
+* Primer:
+  let tekst = unwords ["Funkcionalno", "programiranje", "je", "zanimljivo"]   -- 'tekst' postaje: "Funkcionalno programiranje je zanimljivo"
+
+
+5. unlines
+-----------
+
+* Teorijska osnova: Potpis ove funkcije je unlines :: [String] -> String. Suprotna operacija od lines. Uzima listu redova ([String]) i spaja ih
+  u jedan String, tako sto iza svakog reda automatski dodaje znak za novi red (\n).
+  
+* Primer:
+  let tekst = unlines ["Prvi red", "Drugi red"]   -- 'tekst' postaje: "Prvi red\nDrugi red"
+
+
+6. writeFile
+-------------
+
+* Teorijska osnova: Potpis ove funkcije je writeFile :: FilePath -> String -> IO (). Ovo je I/O funkcija koja uzima putanju do fajla (FilePath) i
+  String koji zelimo da zapisemo. Ako fajl ne postoji, ona ga kreira. Ako fajl vec postoji, potpuno prebrise njegov prethodni sadrzaj novim tekstom
+  
+* Primer:
+  writeFile "izlaz.txt" "Novi sadrzaj fajla\n"   -- kreira/prebrise 'izlaz.txt' tako da sadrzi samo ovu jednu liniju teksta
+  
+  
+7. appendFile
+--------------
+
+* Teorijska osnova: Potpis ove funkcije je appendFile :: FilePath -> String -> IO (). Ovo je I/O funkcija za pisanje u fajl, ali za razliku od writeFile,
+  ona ne brise postojeci sadrzaj, vec novi String dodaje na sam kraj fajla.
+  
+* Primer:
+  appendFile "izlaz.txt" "Dodata linija na kraj\n"   -- fajl 'izlaz.txt' sada sadrzi i stari sadrzaj i novu liniju na kraju
