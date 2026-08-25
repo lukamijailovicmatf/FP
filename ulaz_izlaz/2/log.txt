@@ -1,0 +1,5 @@
+Ovo je neka recenica bez greske
+GRESKA: pogresan ulaz ili podaci
+Na primer matf nikad nije bio GRESKA
+Sve je dobro, ali GRESKA je u necemu drugom
+GRESKa

@@ -1,0 +1,9 @@
+Mleko 150.0
+Telefon 45000.0
+Hleb 90.0
+Cokolada 120.5
+Patike 8500.0
+Kafa 450.0
+Sok 210.0
+Sat 12000.0
+Knjiga 890.0
