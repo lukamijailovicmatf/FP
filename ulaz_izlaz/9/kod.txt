@@ -1,0 +1,6 @@
+# Ovo je komentar
+main = do
+
+  putStrLn "Hello"
+# Jos jedan komentar
+  return ()

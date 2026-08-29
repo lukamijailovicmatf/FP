@@ -1,0 +1,4 @@
+Marko 45
+Ana 82
+Stefan 51
+Elena 38

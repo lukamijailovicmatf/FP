@@ -1,0 +1,3 @@
+Ana 9 8 10
+Marko 7 8 9
+Milena 9 9 9
