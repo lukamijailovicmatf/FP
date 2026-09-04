@@ -1,0 +1,3 @@
+Ovo je kratak tekst.
+Funkcionalno programiranje je super.
+Ana ima psa.
