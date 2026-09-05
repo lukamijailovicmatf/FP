@@ -1,0 +1,3 @@
+Haskell je funkcionalni jezik.
+Danas spremamo ispit.
+Srecno!
