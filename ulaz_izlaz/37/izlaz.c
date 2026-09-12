@@ -1,0 +1,4 @@
+#INCLUDE <STDIO.H>
+INT MAIN()
+{
+}
