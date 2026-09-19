@@ -1,0 +1,12 @@
+/home/korisnik/imena.txt
+/home/korisnik/a.out
+/home/cv.pdf
+/home/korisnik/ulaz.txt
+/home/rezultati.xlsx
+/var/log/apache2/error.log
+
+/var/log/apache2/error.log
+/var/log/dpkg.log
+moj_log.log
+/home/korisnik.login
+/home/korisnik.log.txt
